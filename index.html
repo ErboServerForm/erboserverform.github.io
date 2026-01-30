@@ -3,10 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>エルボ 建国サーバー | 運営募集</title>
+  <meta property="og:title" content="エルボ 建国サーバー | 運営募集">
+  <meta property="og:description" content="統合版マインクラフト建国サーバー『エルボ』の運営メンバー募集中！">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://apply.erbo.f5.si/">
+  <meta property="og:image" content="https://apply.erbo.f5.si/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="エルボ 建国サーバー | 運営募集">
+  <meta name="twitter:description" content="一緒にエルボを運営しよう！">
+  <meta name="twitter:image" content="https://apply.erbo.f5.si/og.png">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 
-  <!-- reCAPTCHA v2 -->
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
@@ -61,7 +70,6 @@
 
     <textarea id="reason" placeholder="志望理由" required></textarea>
 
-    <!-- reCAPTCHA（サイトキーに置き換え） -->
     <div class="g-recaptcha" data-sitekey="6LdTtVssAAAAAJI2pM9fWX6m2LXYDaAZl9DojTMp"></div>
 
     <button type="submit">応募する</button>
@@ -69,7 +77,6 @@
 
   <p id="result"></p>
 
-  <!-- 送信ログ -->
   <div id="logBox">
     <h3>送信ログ（この端末）</h3>
     <ul id="logList"></ul>
@@ -113,7 +120,6 @@ form.addEventListener("submit", async (e) => {
   };
 
   try {
-    // Discord送信
     const dres = await fetch(webhookURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -136,7 +142,6 @@ form.addEventListener("submit", async (e) => {
 
     if (!dres.ok) throw new Error("Discord送信失敗");
 
-    // Formspree送信
     const fres = await fetch(formspreeURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -145,7 +150,6 @@ form.addEventListener("submit", async (e) => {
 
     if (!fres.ok) throw new Error("Formspree送信失敗");
 
-    // ログ表示
     const li = document.createElement("li");
     li.textContent = `${new Date().toLocaleString()} - ${payload.name}（${payload.role}）`;
     logList.prepend(li);
