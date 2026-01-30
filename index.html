@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ELBO 建国サーバー | 運営募集</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>ELBO 建国サーバー</h1>
+  <p>Minecraft 統合版 建国サーバー</p>
+</header>
+
+<section class="intro">
+  <h2>運営メンバー募集</h2>
+  <p>
+    Elboは建国・経済・戦争をテーマにした  
+    マインクラフト統合版サーバーです。  
+    一緒に運営してくれる仲間を募集しています！
+  </p>
+</section>
+
+<section class="roles">
+  <h2>運営役職</h2>
+
+  <div class="card"><h3>Staff</h3><p>ロール管理・招待管理・案内</p></div>
+  <div class="card"><h3>Helper</h3><p>イベント作成・ロール管理・案内</p></div>
+  <div class="card"><h3>Guide</h3><p>キック権限・イベント作成</p></div>
+  <div class="card"><h3>Moderater</h3><p>サーバー管理・Bot追加</p></div>
+</section>
+
+<section class="special">
+  <h2>ガイド以上</h2>
+  <div class="card gold"><h3>Designer</h3><p>動画・画像制作</p></div>
+  <div class="card gold"><h3>Produce</h3><p>アドオン・MOD制作</p></div>
+  <div class="card red"><h3>Developer</h3><p>BOT・システム管理</p></div>
+</section>
+
+<section class="apply">
+  <h2>応募フォーム</h2>
+
+  <form id="applyForm">
+    <input type="text" id="name" placeholder="ユーザー名" required>
+    <input type="text" id="discord" placeholder="Discord名" required>
+    <input type="number" id="age" placeholder="年齢" required>
+
+    <select id="role" required>
+      <option value="">希望役職</option>
+      <option>Staff</option>
+      <option>Helper</option>
+      <option>Guide</option>
+      <option>Moderater</option>
+      <option>Designer</option>
+      <option>Produce</option>
+      <option>Developer</option>
+    </select>
+
+    <textarea id="reason" placeholder="志望理由" required></textarea>
+    <button type="submit">応募する</button>
+  </form>
+
+  <p id="result"></p>
+</section>
+
+<footer>
+  <p>© ELBO Server</p>
+</footer>
+
+<script>
+const webhookURL = "https://discord.com/api/webhooks/1466921440770003146/8ya1FjS4fNRtSPMGHuN7hjTDcQReNcWCpWqvquIxgwgIyj_NXRbP6e7OgaP5eDzZgAx9";
+
+document.getElementById("applyForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    content: "新しい運営応募が届きました！",
+    embeds: [{
+      title: "ELBO 運営応募",
+      color: 3447003,
+      fields: [
+        { name: "名前", value: name.value, inline: true },
+        { name: "Discord", value: discord.value, inline: true },
+        { name: "年齢", value: age.value, inline: true },
+        { name: "希望役職", value: role.value, inline: true },
+        { name: "志望理由", value: reason.value }
+      ],
+      timestamp: new Date()
+    }]
+  };
+
+  await fetch(webhookURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("result").innerText = "応募を送信しました！";
+  e.target.reset();
+});
+</script>
+
+</body>
+</html>
