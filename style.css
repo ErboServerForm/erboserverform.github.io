@@ -30,14 +30,13 @@ section {
   padding: 20px;
   transition: 0.2s;
 }
-
 .card:hover { transform: translateY(-5px); }
 
 .gold { border: 2px solid gold; }
 .red { border: 2px solid crimson; }
 
 .apply form {
-  max-width: 500px;
+  max-width: 520px;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -58,6 +57,15 @@ section {
   border-radius: 10px;
   cursor: pointer;
 }
+
+#logBox {
+  margin-top: 25px;
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 10px;
+}
+#logList { list-style: none; padding-left: 0; }
+#logList li { margin: 6px 0; font-size: 0.9rem; color: #ffd700; }
 
 footer {
   text-align: center;
