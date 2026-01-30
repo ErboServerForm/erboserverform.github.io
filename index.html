@@ -5,6 +5,9 @@
   <title>エルボ 建国サーバー | 運営募集</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+
+  <!-- reCAPTCHA v2 -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 
@@ -24,7 +27,6 @@
 
 <section class="roles">
   <h2>運営役職</h2>
-
   <div class="card"><h3>Staff</h3><p>ロール管理・招待管理・案内</p></div>
   <div class="card"><h3>Helper</h3><p>イベント作成・ロール管理・案内</p></div>
   <div class="card"><h3>Guide</h3><p>キック権限・イベント作成</p></div>
@@ -58,63 +60,96 @@
     </select>
 
     <textarea id="reason" placeholder="志望理由" required></textarea>
+
+    <!-- reCAPTCHA（サイトキーに置き換え） -->
+    <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+
     <button type="submit">応募する</button>
   </form>
 
   <p id="result"></p>
+
+  <!-- 送信ログ -->
+  <div id="logBox">
+    <h3>送信ログ（この端末）</h3>
+    <ul id="logList"></ul>
+  </div>
 </section>
 
 <footer>
-  <p>© Erbo Server</p>
+  <p>© ELBO Server</p>
 </footer>
 
 <script>
-const webhookURL = "https://discord.com/api/webhooks/1466921440770003146/8ya1FjS4fNRtSPMGHuN7hjTDcQReNcWCpWqvquIxgwgIyj_NXRbP6e7OgaP5eDzZgAx9";
+const webhookURL  = "https://discord.com/api/webhooks/1466921440770003146/8ya1FjS4fNRtSPMGHuN7hjTDcQReNcWCpWqvquIxgwgIyj_NXRbP6e7OgaP5eDzZgAx9";
 const formspreeURL = "https://formspree.io/f/mjgrlwvo";
 
-document.getElementById("applyForm").addEventListener("submit", async (e) => {
+const form = document.getElementById("applyForm");
+const result = document.getElementById("result");
+const logList = document.getElementById("logList");
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const token = grecaptcha.getResponse();
+  if (!token) {
+    alert("reCAPTCHAを完了してください。");
+    return;
+  }
 
   const payload = {
     name: name.value,
     discord: discord.value,
     age: age.value,
     role: role.value,
-    reason: reason.value
-  };
-  const discordData = {
-    content: "📩 新しい運営応募が届きました！",
-    embeds: [{
-      title: "ELBO 運営応募",
-      color: 3447003,
-      fields: [
-        { name: "名前", value: payload.name, inline: true },
-        { name: "Discord", value: payload.discord, inline: true },
-        { name: "年齢", value: payload.age, inline: true },
-        { name: "希望役職", value: payload.role, inline: true },
-        { name: "志望理由", value: payload.reason }
-      ],
-      timestamp: new Date()
-    }]
+    reason: reason.value,
+    "g-recaptcha-response": token
   };
 
-  await fetch(webhookURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(discordData)
-  });
+  try {
+    // Discord
+    await fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: "📩 新しい運営応募が届きました！",
+        embeds: [{
+          title: "エルボ 運営応募",
+          color: 3447003,
+          fields: [
+            { name: "名前", value: payload.name, inline: true },
+            { name: "Discord", value: payload.discord, inline: true },
+            { name: "年齢", value: String(payload.age), inline: true },
+            { name: "希望役職", value: payload.role, inline: true },
+            { name: "志望理由", value: payload.reason }
+          ],
+          timestamp: new Date()
+        }]
+      })
+    });
 
-  await fetch(formspreeURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+    // Formspree（reCAPTCHA検証はFormspree側でONに）
+    await fetch(formspreeURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-  document.getElementById("result").innerText = "応募を送信しました！";
-  e.target.reset();
+    // ログ表示
+    const li = document.createElement("li");
+    li.textContent = `${new Date().toLocaleString()} - ${payload.name}（${payload.role}）`;
+    logList.prepend(li);
+
+    result.textContent = "応募を送信しました！";
+    form.reset();
+    grecaptcha.reset();
+
+  } catch (err) {
+    console.error(err);
+    result.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+  }
 });
 </script>
-
 
 </body>
 </html>
