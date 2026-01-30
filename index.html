@@ -77,7 +77,7 @@
 </section>
 
 <footer>
-  <p>© ELBO Server</p>
+  <p>© Erbo Server</p>
 </footer>
 
 <script>
@@ -87,6 +87,12 @@ const formspreeURL = "https://formspree.io/f/mjgrlwvo";
 const form = document.getElementById("applyForm");
 const result = document.getElementById("result");
 const logList = document.getElementById("logList");
+
+const nameInput = document.getElementById("name");
+const discordInput = document.getElementById("discord");
+const ageInput = document.getElementById("age");
+const roleInput = document.getElementById("role");
+const reasonInput = document.getElementById("reason");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -98,17 +104,17 @@ form.addEventListener("submit", async (e) => {
   }
 
   const payload = {
-    name: name.value,
-    discord: discord.value,
-    age: age.value,
-    role: role.value,
-    reason: reason.value,
+    name: nameInput.value,
+    discord: discordInput.value,
+    age: ageInput.value,
+    role: roleInput.value,
+    reason: reasonInput.value,
     "g-recaptcha-response": token
   };
 
   try {
-    // Discord
-    await fetch(webhookURL, {
+    // Discord送信
+    const dres = await fetch(webhookURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -117,23 +123,27 @@ form.addEventListener("submit", async (e) => {
           title: "エルボ 運営応募",
           color: 3447003,
           fields: [
-            { name: "名前", value: payload.name, inline: true },
-            { name: "Discord", value: payload.discord, inline: true },
-            { name: "年齢", value: String(payload.age), inline: true },
-            { name: "希望役職", value: payload.role, inline: true },
-            { name: "志望理由", value: payload.reason }
+            { name: "名前", value: payload.name || "未入力", inline: true },
+            { name: "Discord", value: payload.discord || "未入力", inline: true },
+            { name: "年齢", value: String(payload.age || "未入力"), inline: true },
+            { name: "希望役職", value: payload.role || "未入力", inline: true },
+            { name: "志望理由", value: payload.reason || "未入力" }
           ],
-          timestamp: new Date()
+          timestamp: new Date().toISOString()
         }]
       })
     });
 
-    // Formspree（reCAPTCHA検証はFormspree側でONに）
-    await fetch(formspreeURL, {
+    if (!dres.ok) throw new Error("Discord送信失敗");
+
+    // Formspree送信
+    const fres = await fetch(formspreeURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
+
+    if (!fres.ok) throw new Error("Formspree送信失敗");
 
     // ログ表示
     const li = document.createElement("li");
@@ -146,10 +156,11 @@ form.addEventListener("submit", async (e) => {
 
   } catch (err) {
     console.error(err);
-    result.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+    result.textContent = "送信に失敗しました。Webhookやキーを確認してください。";
   }
 });
 </script>
+
 
 </body>
 </html>
